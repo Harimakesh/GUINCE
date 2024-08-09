@@ -1,6 +1,7 @@
 
 #include "defs.h"
 
+// Checks if a square is on board
 int SqOnBoard(const int sq) {
     return FilesBrd[sq] == OFFBOARD? 0 : 1;
 }

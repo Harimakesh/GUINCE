@@ -97,7 +97,7 @@ typedef struct {
     S_UNDO history[MAXGAMEMOVES];  
 
     // piece list
-    int pList[13][10];
+    int pList[13][10];  // position of a certain piece and its index(1st pawn, 2nd...) 
 
 
 
@@ -202,6 +202,7 @@ extern int SqAttacked(const int sq, const int side, const S_BOARD *pos);
 //io.c
 extern char *PrSq(const int sq);
 extern char *PrMove(const int move);
+extern void PrintMoveList(const S_MOVELIST *list);
 
 //validate.c
 extern int PieceValid(const int pce);
@@ -209,4 +210,8 @@ extern int PieceValidEmpty(const int pce);
 extern int SqOnBoard(const int sq);
 extern int FileRankValid(const int fr);
 extern int SideValid(const int side);
+
+//movegen.c
+extern void GenerateAllMoves( const S_BOARD *pos, S_MOVELIST *list);
+
 #endif
