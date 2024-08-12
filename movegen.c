@@ -4,6 +4,11 @@
 #define MOVE(f, t , ca, pro, fl) ( (f) | ((t) << 7) | ((ca) << 14) | ((pro) << 20) | (fl))
 #define SQOFFBOARD(sq) (FilesBrd[sq] == OFFBOARD) 
 
+int SlidePce[2][3] = {{ wB, wR, wQ },{ bB, bR, bQ }};
+int NonSlidePce[2][2] = {{ wN, wK },{ bN, bK }};
+
+
+
 void AddQuietMove ( const S_BOARD *pos, int move, S_MOVELIST *list ) {
     list->moves[list->count].move = move;
     list->moves[list->count].score = 0;
@@ -21,6 +26,11 @@ void AddEnPassantMove ( const S_BOARD *pos, int move, S_MOVELIST *list ) {
 }
 
 void AddWhitePawnCapMove( const S_BOARD *pos, const int from, const int to, const int cap, S_MOVELIST *list) {
+
+    ASSERT(PieceValidEmpty(cap));
+    ASSERT(SqOnBoard(from));
+    ASSERT(SqOnBoard(to));
+
     if(RanksBrd[from] == RANK_7) {
         AddCaptureMove(pos, MOVE(from, to, cap, wQ, 0), list);
         AddCaptureMove(pos, MOVE(from, to, cap, wR, 0), list);
@@ -33,6 +43,10 @@ void AddWhitePawnCapMove( const S_BOARD *pos, const int from, const int to, cons
 }
 
 void AddWhitePawnMove( const S_BOARD *pos, const int from, const int to, S_MOVELIST *list) {
+
+    ASSERT(SqOnBoard(from));
+    ASSERT(SqOnBoard(to));
+
     if(RanksBrd[from] == RANK_7) {
         AddQuietMove(pos, MOVE(from, to, EMPTY, wQ, 0), list);
         AddQuietMove(pos, MOVE(from, to, EMPTY, wR, 0), list);
@@ -45,6 +59,11 @@ void AddWhitePawnMove( const S_BOARD *pos, const int from, const int to, S_MOVEL
 }
 
 void AddBlackPawnCapMove( const S_BOARD *pos, const int from, const int to, const int cap, S_MOVELIST *list) {
+
+    ASSERT(PieceValidEmpty(cap));
+    ASSERT(SqOnBoard(from));
+    ASSERT(SqOnBoard(to));
+
     if(RanksBrd[from] == RANK_2) {
         AddCaptureMove(pos, MOVE(from, to, cap, bQ, 0), list);
         AddCaptureMove(pos, MOVE(from, to, cap, bR, 0), list);
@@ -57,6 +76,10 @@ void AddBlackPawnCapMove( const S_BOARD *pos, const int from, const int to, cons
 }
 
 void AddBlackPawnMove( const S_BOARD *pos, const int from, const int to, S_MOVELIST *list) {
+
+    ASSERT(SqOnBoard(from));
+    ASSERT(SqOnBoard(to));
+
     if(RanksBrd[from] == RANK_2) {
         AddQuietMove(pos, MOVE(from, to, EMPTY, bQ, 0), list);
         AddQuietMove(pos, MOVE(from, to, EMPTY, bR, 0), list);
@@ -135,4 +158,11 @@ void GenerateAllMoves( const S_BOARD *pos, S_MOVELIST *list) {
             
         }
     }
+
+    /* Loop slides */
+    for(int i = 0; i < 3; i++)
+        printf("Pce: %d\n", SlidePce[side][i]);
+    /* Loop non slides*/
+    for(int i = 0; i < 2; i++)
+        printf("Pce: %d\n", NonSlidePce[side][i]);
 }
