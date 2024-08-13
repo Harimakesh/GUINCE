@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include "defs.h"
 
+/* Print square in algebriac notation */
 char *PrSq(const int sq) {
     
     static char SqStr[3];
