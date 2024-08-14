@@ -182,7 +182,28 @@ void GenerateAllMoves( const S_BOARD *pos, S_MOVELIST *list) {
 
     /* Loop slides */
     for(int i = 0; i < 3; i++){
+        pce = SlidePce[side][i];
+        for(pceNum = 0; pceNum < pos->pceNum[pce]; ++pceNum){
+            sq = pos->pList[pce][pceNum];
+            ASSERT(SqOnBoard(sq));
+            printf("Piece:%c on %s\n", PceChar[pce], PrSq(sq));
 
+            for(index = 0; index < NumDir[pce]; ++index){
+                dir = PceDir[pce][index];
+                t_sq = sq + dir;
+                while(!SQOFFBOARD(t_sq)){
+                    if(pos->pieces[t_sq] != EMPTY){
+                        if(PieceCol[pos->pieces[t_sq]] == side ^ 1){
+                            printf("\t\tCapture on %s\n", PrSq(t_sq));
+                        }
+                        break;
+                    }
+                    printf("\t\tNormal on %s\n", PrSq(t_sq));
+                    t_sq += dir;             
+                }
+
+            }
+        }
     }
     /* Loop non slides*/
     for(int i = 0; i < 2; i++){
