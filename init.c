@@ -15,7 +15,7 @@ int Sq64ToSq120[64];
 U64 SetMask[64];
 U64 ClearMask[64];
 
-U64 PieceKeys[13][120];
+U64 PieceKeys[13][120]; // RAND64 values for each piece for each position(120 possible positions)
 U64 SideKey;
 U64 CastleKeys[16];
 

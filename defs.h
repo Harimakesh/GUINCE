@@ -65,7 +65,7 @@ typedef struct {
     int castlePerm;
     int enPas;
     int fiftyMove;
-    U64 posKey;
+    U64 posKey; 
 
 } S_UNDO;
 
@@ -97,7 +97,7 @@ typedef struct {
     S_UNDO history[MAXGAMEMOVES];  
 
     // piece list
-    int pList[13][10];  // position of a certain piece and its index(1st pawn, 2nd...) 
+    int pList[13][10];  // position of a certain piece and its index(1st pawn, 2nd...)
 
 
 
@@ -165,6 +165,7 @@ extern int PieceMaj[13];
 extern int PieceMin[13];
 extern int PieceVal[13];
 extern int PieceCol[13];
+extern int PiecePawn[13];
 
 extern int FilesBrd[BRD_SQ_NUM];
 extern int RanksBrd[BRD_SQ_NUM];
