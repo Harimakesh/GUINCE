@@ -7,6 +7,7 @@
 #define HASH_CA (pos->posKey ^= (CastleKeys[(pos->castlePerm)]))
 #define HASH_SIDE (pos->posKey ^= (SideKey))
 #define HASH_EP (pos->posKey ^= (PieceKeys[EMPTY][(pos->enPas)]))
+#define HISTORY (pos->history[pos->hisPly])
 
 const int CastlePerm[120] = {
     15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
@@ -25,7 +26,7 @@ const int CastlePerm[120] = {
 
 // Removing a piece from the board
 static void ClearPiece(const int sq, S_BOARD *pos) {
-
+    
     ASSERT(SqOnBoard(sq));
 
     int pce = pos->pieces[sq];
@@ -106,7 +107,6 @@ static void MovePiece(const int from, const int to, S_BOARD *pos) {
     int index = 0;
     int pce = pos->pieces[from];
     int col = PieceCol[pce];
-
 #ifdef DEBUG
     int t_pceNum = FALSE;
 #endif
@@ -123,12 +123,12 @@ static void MovePiece(const int from, const int to, S_BOARD *pos) {
         SETBIT(pos->pawns[col], SQ64(to));
         SETBIT(pos->pawns[BOTH], SQ64(to));
     }
-   
-    for(index = 0; index < pos->pceNum[pce]; index++) {
+
+    for(index = 0; index < pos->pceNum[pce]; ++index) {
         if(pos->pList[pce][index] == from) {
             pos->pList[pce][index] = to;
 #ifdef DEBUG
-            int t_pceNum = TRUE;
+            t_pceNum = TRUE;
 #endif
             break;
         }
@@ -137,7 +137,7 @@ static void MovePiece(const int from, const int to, S_BOARD *pos) {
 }
 
 int MakeMove(S_BOARD *pos, int move) {
-
+    
     ASSERT(CheckBoard(pos));
 
     int from = FROMSQ(move);
@@ -150,7 +150,7 @@ int MakeMove(S_BOARD *pos, int move) {
     ASSERT(PieceValid(pos->pieces[from]));
 
     pos->history[pos->hisPly].posKey = pos->posKey;
-
+    
     if(move & MFLAGEP) {
         if(side == WHITE) {
             ClearPiece(to - 10, pos);
@@ -194,7 +194,7 @@ int MakeMove(S_BOARD *pos, int move) {
 
     if(captured != EMPTY) {
         ASSERT(PieceValid(captured));
-        ClearPiece(captured, pos);
+        ClearPiece(to, pos);
         pos->fiftyMove = 0;
     }
 
@@ -214,7 +214,8 @@ int MakeMove(S_BOARD *pos, int move) {
             HASH_EP;
         }
     }
-
+    
+    
     MovePiece(from ,to, pos);
 
     int prpce = PROMOTED(move);
@@ -223,7 +224,7 @@ int MakeMove(S_BOARD *pos, int move) {
         ClearPiece(to, pos);
         AddPiece(to, pos, prpce); 
     }
-
+ 
     if(PieceKing[pos->pieces[to]]) {
         pos->KingSq[pos->side] = to;
     }
@@ -234,10 +235,72 @@ int MakeMove(S_BOARD *pos, int move) {
     ASSERT(CheckBoard(pos));
 
     if(SqAttacked(pos->KingSq[side], pos->side, pos)) {
-        // TakeMove(pos);
+        TakeMove(pos);
         return FALSE;
     }
 
     return TRUE;
 
+}
+
+void TakeMove(S_BOARD *pos) {
+    ASSERT(CheckBoard(pos));
+
+    pos->hisPly--;
+    pos->ply--;
+
+    int move = pos->history[pos->hisPly].move;
+    int from = FROMSQ(move);
+    int to = TOSQ(move);
+
+    ASSERT(SqOnBoard(from));
+    ASSERT(SqOnBoard(to));
+
+    if(pos->enPas != NO_SQ) HASH_EP;
+    HASH_CA;
+
+    pos->castlePerm = HISTORY.castlePerm;
+    pos->fiftyMove = HISTORY.fiftyMove;
+    pos->enPas = HISTORY.enPas;
+
+    if(pos->enPas != NO_SQ) HASH_EP;
+    HASH_CA;
+
+    pos->side ^= 1;
+    HASH_SIDE;
+
+    if(MFLAGEP & move) {
+        if(pos->side ==WHITE) {
+            AddPiece(to - 10, pos, bP);
+        } else {
+            AddPiece(to + 10, pos, wP);
+        }
+    } else if (MFLAGCA & move) {
+        switch(to) {
+            case C1: MovePiece(D1, A1, pos); break;
+            case C8: MovePiece(D8, A8, pos); break;
+            case G1: MovePiece(F1, H1, pos); break;
+            case G8: MovePiece(F8, H8, pos); break;
+            default: ASSERT(FALSE); break;
+        }
+    }
+
+    MovePiece(to, from, pos);
+
+    if(PieceKing[pos->pieces[from]]) {
+        pos->KingSq[pos->side] = from;
+    }
+
+    int captured = CAPTURED(move);
+    if(captured != EMPTY) {
+        ASSERT(PieceValid(captured));
+        AddPiece(to, pos, captured);
+    }
+
+    if(PROMOTED(move) != EMPTY) {
+        ASSERT(PieceValid(PROMOTED(move)) && !PiecePawn[PROMOTED(move)]);
+        ClearPiece(from, pos);
+        AddPiece(from, pos, (PieceCol[PROMOTED(move)] == WHITE ? wP : bP));
+    }
+    ASSERT(CheckBoard(pos));
 }

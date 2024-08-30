@@ -212,8 +212,17 @@ extern int PieceValidEmpty(const int pce);
 extern int SqOnBoard(const int sq);
 extern int FileRankValid(const int fr);
 extern int SideValid(const int side);
+extern int PieceValidEmpty(const int pce);
+extern int PceValidEmptyOffbrd(const int pce);
 
 //movegen.c
 extern void GenerateAllMoves( const S_BOARD *pos, S_MOVELIST *list);
 
+// makemove.c
+extern int MakeMove(S_BOARD *pos, int move);
+extern void TakeMove(S_BOARD *pos);
+
+// perft.c
+extern void perfTest(int depth, S_BOARD *pos, long *leafnodes);
+extern void ParseFile();
 #endif

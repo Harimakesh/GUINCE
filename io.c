@@ -54,7 +54,7 @@ void PrintMoveList(const S_MOVELIST *list) {
         move = list->moves[index].move;
         score = list->moves[index].score;
 
-        printf( "Move: %d > %s (score: %d)\n", index + 1, PrMove(move), score);
+        printf( "Move: %d > %s  %d %d (score: %d)\n", index + 1, PrMove(move), FROMSQ(move),TOSQ(move),score);
     }
     printf("MoveList Total %d moves:\n\n", list->count);
 }

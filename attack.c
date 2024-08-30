@@ -15,7 +15,6 @@ int SqAttacked(const int sq, const int side, const S_BOARD *pos) {
     ASSERT(SideValid(side));
     ASSERT(CheckBoard(pos));
 
-    //pawns
     if(side == WHITE) {
         if(pos->pieces[sq - 11] == wP || pos->pieces[sq - 9] == wP){
             return TRUE;
@@ -25,20 +24,23 @@ int SqAttacked(const int sq, const int side, const S_BOARD *pos) {
             return TRUE;
         }
     }
-
+    
     // knights
     for(index = 0; index < 8; ++index) {
         pce = pos->pieces[sq + KnDir[index]];
-        if(IsKn(pce) && PieceCol[pce] == side){
+        if(pce != OFFBOARD && IsKn(pce) && PieceCol[pce] == side){
+            // printf("%c %d %d %c ",SideChar[PieceCol[pce]], pce ,sq + KnDir[index], SideChar[side]);
             return TRUE;
         }
     }
+    
 
     //rooks and queens
     for(index = 0; index < 4; ++index) {
         // go along 'dir' until pce encountered
         dir = RkDir[index];
         t_sq = sq + dir;
+
         pce = pos->pieces[t_sq];
         while (pce != OFFBOARD) {
             if( pce != EMPTY) {
@@ -52,7 +54,7 @@ int SqAttacked(const int sq, const int side, const S_BOARD *pos) {
         }
         
     }
-
+    
     // bishop and queen
     for(index = 0; index < 4; ++index) {
         // go along 'dir' until pce encountered or OFFBOARD
@@ -71,14 +73,16 @@ int SqAttacked(const int sq, const int side, const S_BOARD *pos) {
         }
         
     }
+    
 
     // kings
     for(index = 0; index < 8; ++index) {
         pce = pos->pieces[sq + KiDir[index]];
-        if(IsKi(pce) && PieceCol[pce] == side){
+        if(pce != OFFBOARD && IsKi(pce) && PieceCol[pce] == side){
             return TRUE;
         }
     }
+   
 
     return FALSE;
 
